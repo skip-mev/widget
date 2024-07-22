@@ -1,5 +1,43 @@
 # @skip-go/widget
 
+## 2.1.0
+
+### Minor Changes
+
+- b22d262: Revert shadow dom implentation to use react-shadow-scope
+
+## 2.0.1
+
+### Patch Changes
+
+- f621037: Update misc styling in widget
+
+## 2.0.0
+
+### Major Changes
+
+- e10995d: Add theme prop to enable custom styling
+
+### Patch Changes
+
+- 0eccea4: Fix auto selecting input fields in shadow-dom
+
+## 1.3.1
+
+### Patch Changes
+
+- 6acd8e2: enable iframe wallets
+
+## 1.3.0
+
+### Minor Changes
+
+- dcb144b: Export SwapWidgetWithoutProvider
+
+### Patch Changes
+
+- 6eb6740: source chain forma validate gas balance off
+
 ## 1.2.6
 
 ### Patch Changes

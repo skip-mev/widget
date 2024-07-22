@@ -1,54 +1,99 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { SwapWidgetProvider, SwapWidgetProviderProps } from '../provider';
 import {
   configureSwapWidget,
   ConfigureSwapWidgetArgs,
 } from '../store/swap-widget';
-import { SwapWidgetUI } from './Widget';
-import shadowDomStyles from '../styles/shadowDomStyles.css';
-import toastStyles from '../styles/toastStyles.css';
-import cssReset from '../styles/cssReset.css';
-import { Scope } from 'react-shadow-scope';
-import { useInjectFontsToDocumentHead } from '../hooks/use-inject-fonts-to-document-head';
+import { SwapWidgetUI, SwapWidgetUIProps } from './Widget';
+import { defaultTheme, PartialTheme } from './theme';
+import { WithStyledShadowDom } from './WithStyledShadowDom';
+import { ThemeProvider } from 'styled-components';
 
-export type SwapWidgetProps = Pick<
-  React.HTMLAttributes<HTMLDivElement>,
-  'className' | 'style'
-> &
-  ConfigureSwapWidgetArgs &
+export type SwapWidgetWithoutProvidersProps = SwapWidgetUIProps &
+  ConfigureSwapWidgetArgs & {
+    theme?: PartialTheme;
+  };
+
+export type SwapWidgetProps = SwapWidgetWithoutProvidersProps &
   Partial<SwapWidgetProviderProps>;
 
-export const SwapWidget: React.FC<SwapWidgetProps> = ({
-  colors,
+export const SwapWidgetWithoutProviders: React.FC<
+  SwapWidgetWithoutProvidersProps
+> = ({
   settings,
   onlyTestnet,
   defaultRoute,
   routeConfig,
-  className,
-  style,
+  theme,
   filter,
-  ...swapWidgetProviderProps
+  ...swapWidgetUIProps
 }) => {
-  useInjectFontsToDocumentHead();
   useEffect(() => {
     configureSwapWidget({
-      colors,
       onlyTestnet,
       settings,
       defaultRoute,
       routeConfig,
       filter,
     });
-  }, [colors, onlyTestnet, settings, defaultRoute, routeConfig]);
+  }, [onlyTestnet, settings, defaultRoute, routeConfig]);
+
+  const mergedThemes = useMemo(() => {
+    return {
+      ...defaultTheme,
+      ...theme,
+    };
+  }, [defaultTheme, theme]);
 
   return (
-    <Scope
-      stylesheets={[cssReset, toastStyles, shadowDomStyles]}
-      config={{ dsd: 'emulated' }}
-    >
-      <SwapWidgetProvider {...swapWidgetProviderProps}>
-        <SwapWidgetUI className={className} style={style} />
-      </SwapWidgetProvider>
-    </Scope>
+    <WithStyledShadowDom>
+      <ThemeProvider theme={mergedThemes}>
+        <SwapWidgetUI {...swapWidgetUIProps} />
+      </ThemeProvider>
+    </WithStyledShadowDom>
+  );
+};
+
+export const SwapWidget: React.FC<SwapWidgetProps> = ({
+  settings,
+  onlyTestnet,
+  defaultRoute,
+  routeConfig,
+  theme,
+  className,
+  style,
+  filter,
+  toasterProps,
+  ...swapWidgetProviderProps
+}) => {
+  useEffect(() => {
+    configureSwapWidget({
+      onlyTestnet,
+      settings,
+      defaultRoute,
+      routeConfig,
+      filter,
+    });
+  }, [onlyTestnet, settings, defaultRoute, routeConfig]);
+
+  const mergedThemes = useMemo(() => {
+    return {
+      ...defaultTheme,
+      ...theme,
+    };
+  }, [defaultTheme, theme]);
+
+  return (
+    <WithStyledShadowDom>
+      <ThemeProvider theme={mergedThemes}>
+        <SwapWidgetProvider {...swapWidgetProviderProps}>
+          <SwapWidgetUI
+            className={className}
+            style={style}
+            toasterProps={toasterProps}
+          />
+        </SwapWidgetProvider>
+      </ThemeProvider>
+    </WithStyledShadowDom>
   );
 };
