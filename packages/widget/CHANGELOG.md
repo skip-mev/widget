@@ -1,5 +1,47 @@
 # @skip-go/widget
 
+## 2.3.0
+
+### Minor Changes
+
+- 7fb01d3: add makeDestinationWallets param to provider
+
+## 2.2.4
+
+### Patch Changes
+
+- cca30c1: expose provider props
+
+## 2.2.3
+
+### Patch Changes
+
+- bb83c5f: use chain name if pretty name empty
+
+## 2.2.2
+
+### Patch Changes
+
+- a3a03f0: increase API chains data usage
+
+## 2.2.1
+
+### Patch Changes
+
+- 81833e6: remove chains codegen
+
+## 2.2.0
+
+### Minor Changes
+
+- 52e827f: Add prop persistSwapWidgetState
+
+## 2.1.1
+
+### Patch Changes
+
+- 5533dbe: Add missing toast styles for toast.error
+
 ## 2.1.0
 
 ### Minor Changes

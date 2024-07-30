@@ -33,12 +33,14 @@ export type SwapWidgetUIProps = Pick<
   'className' | 'style'
 > & {
   toasterProps?: ToasterProps;
+  persistSwapWidgetState?: boolean;
 };
 
 export const SwapWidgetUI = ({
   className,
   style,
   toasterProps,
+  persistSwapWidgetState,
 }: SwapWidgetUIProps) => {
   const theme = useTheme();
   useEffect(() => void disclosure.rehydrate(), []);
@@ -55,10 +57,13 @@ export const SwapWidgetUI = ({
 
   const { data: sourceChains } = useChains({
     select: (chains) => {
-      if (!sourceChainIDs) return chains;
-      return chains?.filter((chain) => {
-        return sourceChainIDs?.includes(chain.chainID);
-      });
+      if (!sourceChainIDs)
+        return chains?.filter((c) => !c.chainID.includes('penumbra'));
+      return chains
+        ?.filter((chain) => {
+          return sourceChainIDs?.includes(chain.chainID);
+        })
+        .filter((c) => !c.chainID.includes('penumbra'));
     },
   });
   const { data: destinationChains } = useChains({
@@ -102,7 +107,7 @@ export const SwapWidgetUI = ({
     swapPriceImpactPercent,
     usdDiffPercent,
     shareable,
-  } = useSwapWidget();
+  } = useSwapWidget(persistSwapWidgetState);
 
   const srcAccount = useAccount(sourceChain?.chainID);
 
@@ -264,6 +269,17 @@ export const SwapWidgetUI = ({
                     dydx frontend
                   </AdaptiveLink>{' '}
                   directions to set up a trading account
+                </p>
+              </div>
+            )}
+            {destinationChain?.chainID.includes('penumbra') && (
+              <div className="flex w-full items-center rounded-md bg-red-50 p-3 text-left text-xs font-medium uppercase text-red-500">
+                <p className="flex-1 [&_a]:underline text-red-500">
+                  Notice: Skip Go currently only supports depositing assets into
+                  Penumbra. To withdraw assets from Penumbra, please use:
+                  <AdaptiveLink href="https://stake.with.starlingcyber.net/">
+                    https://stake.with.starlingcyber.net/
+                  </AdaptiveLink>
                 </p>
               </div>
             )}

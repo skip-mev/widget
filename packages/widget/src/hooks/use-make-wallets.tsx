@@ -20,6 +20,7 @@ export interface MinimalWallet {
   getAddress?: (props: {
     signRequired?: boolean;
     context?: 'recovery' | 'destination';
+    penumbraWalletIndex?: number;
   }) => Promise<string | undefined>;
 }
 
@@ -59,7 +60,7 @@ export const useMakeWallets = () => {
     let wallets: MinimalWallet[] = [];
 
     if (chainType === 'cosmos') {
-      const chainName = chainIdToName[chainID];
+      const chainName = chainIdToName(chainID);
       const walletRepo = getWalletRepo(chainName);
       wallets = walletRepo.wallets.map((wallet) => ({
         walletName: wallet.walletName,

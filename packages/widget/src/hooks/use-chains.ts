@@ -1,8 +1,6 @@
 import { Chain as SkipChain } from '@skip-go/core';
 import { useQuery } from '@tanstack/react-query';
 import { useSkipClient } from './use-skip-client';
-import { chainIdToName } from '../chains';
-import { chainIdToPrettyName } from '../chains/pretty';
 import { useSwapWidgetUIStore } from '../store/swap-widget';
 
 export type Chain = SkipChain & {
@@ -32,8 +30,8 @@ export function useChains<T = Chain[]>(args: UseChainsQueryArgs<T> = {}) {
         .map((chain): Chain => {
           return {
             ...chain,
-            chainName: chainIdToName[chain.chainID] || chain.chainName,
-            prettyName: chainIdToPrettyName[chain.chainID] || chain.chainName,
+            chainName: chain.chainName,
+            prettyName: chain.prettyName || chain.chainName,
             logoURI: chain.logoURI || 'https://api.dicebear.com/6.x/shapes/svg',
           };
         })

@@ -27,11 +27,11 @@ import { useAccount } from './use-account';
 import { Chain, useChains } from './use-chains';
 import { useBalancesByChain } from './use-balances-by-chain';
 import { useRoute } from './use-route';
-import { getChainFeeAssets, getChainGasPrice } from '../utils/chain';
 import { useSkipClient } from './use-skip-client';
 import { getAmountWei, parseAmountWei } from '../utils/number';
 import { gracefullyConnect } from '../utils/wallet';
 import { useSwapWidgetUIStore } from '../store/swap-widget';
+import { chainIdToName } from '../chains';
 
 const DEFAULT_SRC_CHAIN_ID = 'cosmoshub-4';
 const PRICE_IMPACT_THRESHOLD = 0.1;
@@ -45,12 +45,16 @@ export interface DefaultRouteConfig {
   destAssetDenom?: string;
 }
 
-export function useSwapWidget() {
+export function useSwapWidget(persistSwapWidgetState = true) {
   /**
    * intentional manual hydration to prevent ssr mismatch
    * @see {useSwapWidgetStore}
    */
-  useEffect(() => void useSwapWidgetStore.persist.rehydrate(), []);
+  useEffect(() => {
+    if (persistSwapWidgetState) {
+      useSwapWidgetStore.persist.rehydrate();
+    }
+  }, []);
 
   /////////////////////////////////////////////////////////////////////////////
 
@@ -344,6 +348,14 @@ export function useSwapWidget() {
               x.recommendedSymbol?.toLowerCase() === 'usdc'
           );
         }
+        if (chain.chainType === 'svm') {
+          asset = assets.find(
+            (x) =>
+              // default to usdc
+              x.denom.toLowerCase() ===
+              'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'.toLowerCase()
+          );
+        }
         asset ??= assets[0];
       }
 
@@ -582,21 +594,20 @@ export function useSwapWidget() {
         [state.sourceChain, state.sourceAsset, state.sourceFeeAsset] as const,
       async ([srcChain, srcAsset, srcFeeAsset]) => {
         if (!(srcChain?.chainType === 'cosmos' && srcAsset)) return;
+        if (srcChain?.chainID.includes('penumbra')) return;
+        const feeAsset = srcChain.feeAssets?.[0];
+        const gas = `${feeAsset?.gasPrice?.average}${feeAsset.denom}`;
+        const gasPrice = GasPrice.fromString(gas);
 
-        let srcGasPrice = getChainGasPrice(srcChain.chainID);
+        let srcGasPrice = feeAsset?.gasPrice && gasPrice;
 
         if (!srcFeeAsset || srcFeeAsset.chainID !== srcChain.chainID) {
           if (srcGasPrice) {
-            srcFeeAsset = assetsByChainID(srcChain.chainID).find(
-              ({ denom }) => {
-                return denom === srcGasPrice!.denom;
-              }
-            );
+            srcFeeAsset = getAsset(srcGasPrice!.denom, srcChain.chainID);
           } else {
             srcFeeAsset = await getFeeAsset(srcChain.chainID);
           }
         }
-
         if (!srcFeeAsset) {
           toast.error(`Unable to find gas asset for ${srcChain.chainName}`);
           return;
@@ -615,12 +626,6 @@ export function useSwapWidget() {
           let feeDenomPrices = srcChain.feeAssets.find(({ denom }) => {
             return denom === srcFeeAsset?.denom;
           });
-
-          feeDenomPrices ??= (await getChainFeeAssets(srcChain.chainID)).find(
-            ({ denom }) => {
-              return denom === srcFeeAsset?.denom;
-            }
-          );
 
           if (!feeDenomPrices || !feeDenomPrices.gasPrice) {
             toast.error(
@@ -712,8 +717,12 @@ export function useSwapWidget() {
       async (srcChain) => {
         const { cosmos, svm } = trackWallet.get();
 
-        if (srcChain && srcChain.chainType === 'cosmos') {
-          const { wallets } = getWalletRepo(srcChain.chainName);
+        if (
+          srcChain &&
+          srcChain.chainType === 'cosmos' &&
+          !srcChain.chainID.includes('penumbra')
+        ) {
+          const { wallets } = getWalletRepo(chainIdToName(srcChain.chainID));
           let wallet: (typeof wallets)[number] | undefined;
 
           if (cosmos?.chainType === 'cosmos') {

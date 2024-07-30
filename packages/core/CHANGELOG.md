@@ -1,5 +1,17 @@
 # @skip-go/core
 
+## 0.4.3
+
+### Patch Changes
+
+- f17527e: add explorerLink to onTransactionTracked callback
+
+## 0.4.2
+
+### Patch Changes
+
+- fe6981a: Add explorer link to tx track response
+
 ## 0.4.1
 
 ### Patch Changes
