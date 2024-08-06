@@ -105,6 +105,8 @@ import {
   SwapJSON,
   EvmSwap,
   EvmSwapJSON,
+  SvmSwap,
+  SvmSwapJSON,
   SwapOperation,
   SwapOperationJSON,
   SwapRoute,
@@ -849,6 +851,30 @@ export function evmSwapToJSON(evmSwap: EvmSwap): EvmSwapJSON {
   };
 }
 
+export function svmSwapFromJSON(svmSwapJSON: SvmSwapJSON): SvmSwap {
+  return {
+    amountIn: svmSwapJSON.amount_in,
+    amountOut: svmSwapJSON.amount_out,
+    denomIn: svmSwapJSON.denom_in,
+    denomOut: svmSwapJSON.denom_out,
+    fromChainID: svmSwapJSON.from_chain_id,
+    swapVenues: svmSwapJSON.swap_venues.map(swapVenueFromJSON),
+    payload: svmSwapJSON.payload,
+  };
+}
+
+export function svmSwapToJSON(svmSwap: SvmSwap): SvmSwapJSON {
+  return {
+    amount_in: svmSwap.amountIn,
+    amount_out: svmSwap.amountOut,
+    denom_in: svmSwap.denomIn,
+    denom_out: svmSwap.denomOut,
+    from_chain_id: svmSwap.fromChainID,
+    swap_venues: svmSwap.swapVenues.map(swapVenueToJSON),
+    payload: svmSwap.payload,
+  };
+}
+
 export function operationFromJSON(operationJSON: OperationJSON): Operation {
   if ('transfer' in operationJSON) {
     return {
@@ -915,8 +941,17 @@ export function operationFromJSON(operationJSON: OperationJSON): Operation {
     };
   }
 
+  if ('evm_swap' in operationJSON) {
+    return {
+      evmSwap: evmSwapFromJSON(operationJSON.evm_swap),
+      txIndex: operationJSON.tx_index,
+      amountIn: operationJSON.amount_in,
+      amountOut: operationJSON.amount_out,
+    };
+  }
+
   return {
-    evmSwap: evmSwapFromJSON(operationJSON.evm_swap),
+    svmSwap: svmSwapFromJSON(operationJSON.svm_swap),
     txIndex: operationJSON.tx_index,
     amountIn: operationJSON.amount_in,
     amountOut: operationJSON.amount_out,
@@ -987,8 +1022,17 @@ export function operationToJSON(operation: Operation): OperationJSON {
     };
   }
 
+  if ('evmSwap' in operation) {
+    return {
+      evm_swap: evmSwapToJSON(operation.evmSwap),
+      tx_index: operation.txIndex,
+      amount_in: operation.amountIn,
+      amount_out: operation.amountOut,
+    };
+  }
+
   return {
-    evm_swap: evmSwapToJSON(operation.evmSwap),
+    svm_swap: svmSwapToJSON(operation.svmSwap),
     tx_index: operation.txIndex,
     amount_in: operation.amountIn,
     amount_out: operation.amountOut,

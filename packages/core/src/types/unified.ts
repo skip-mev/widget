@@ -23,6 +23,8 @@ import {
   Reason,
   EvmSwap,
   EvmSwapJSON,
+  SvmSwap,
+  SvmSwapJSON,
   Swap,
   SwapJSON,
   SwapVenue,
@@ -293,6 +295,12 @@ export type OperationJSON =
       tx_index: number;
       amount_in: string;
       amount_out: string;
+    }
+  | {
+      svm_swap: SvmSwapJSON;
+      tx_index: number;
+      amount_in: string;
+      amount_out: string;
     };
 
 export type Operation =
@@ -325,6 +333,12 @@ export type Operation =
     }
   | {
       opInitTransfer: OPInitTransfer;
+      txIndex: number;
+      amountIn: string;
+      amountOut: string;
+    }
+  | {
+      svmSwap: SvmSwap;
       txIndex: number;
       amountIn: string;
       amountOut: string;
