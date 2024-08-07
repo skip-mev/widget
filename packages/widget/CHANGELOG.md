@@ -1,5 +1,47 @@
 # @skip-go/widget
 
+## 2.3.7
+
+### Patch Changes
+
+- 97837ef: Use monospace font for address input
+
+## 2.3.6
+
+### Patch Changes
+
+- 9207d3e: Show last swap when there are multiple on a chain in transaction preview
+
+## 2.3.5
+
+### Patch Changes
+
+- c6690de: clarify noble cctp ledger warning
+
+## 2.3.4
+
+### Patch Changes
+
+- 640eafa: add pretty name in asset selection
+
+## 2.3.3
+
+### Patch Changes
+
+- 9f2fd06: remove error toast parsing gas asset
+
+## 2.3.2
+
+### Patch Changes
+
+- d98865b: Update CCTP Warning message
+
+## 2.3.1
+
+### Patch Changes
+
+- d90ddd5: add source chain id in getAddress
+
 ## 2.3.0
 
 ### Minor Changes
